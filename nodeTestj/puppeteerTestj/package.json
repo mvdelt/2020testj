@@ -1,0 +1,15 @@
+{
+  "name": "puppeteertestj",
+  "version": "1.0.0",
+  "description": "puppeteer test j",
+  "main": "puppeteerTestj.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jc",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^5.0.0",
+    "request": "^2.88.2"
+  }
+}

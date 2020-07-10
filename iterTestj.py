@@ -1,0 +1,22 @@
+ra = range(10)
+print(ra)
+li = list(ra)
+print(li)
+it = iter(li)
+print(it)
+
+# for i in it:
+#     print(i)
+#     next(it)
+
+print(next(iter(li)))
+print(next(iter(li)))
+print(next(iter(li)))
+print(next(iter(li)))
+print(next(iter(li)))
+print('-------------')
+print(next(it))
+print(next(it))
+print(next(it))
+print(next(it))
+print(next(it))
