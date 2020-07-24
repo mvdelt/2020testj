@@ -105,4 +105,5 @@ def merge_two_anno_obj(anno1, anno2):
 # merge_anno_files("C:/Users/starriet/Desktop/pa_keypointj_upper_merged/train", "C:/Users/starriet/Desktop/pa_keypointj_upper_merged/train/pa_kp_anno_upper_merged.json")
 # merge_anno_files("C:/Users/starriet/Desktop/pa_keypointj_upper_merged", "C:/Users/starriet/Desktop/pa_keypointj_upper_merged/train/pa_kp_anno_upper_merged.json")
 # merge_anno_files(r"C:\Users\starriet\Desktop\pa_keypointj_upper_merged", r"C:\Users\starriet\Desktop\pa_keypointj_upper_merged\pa_kp_anno_upper_merged_until3-47over111.json")
-merge_anno_files(r"C:\Users\starriet\Desktop\pa_keypointj_upper_merged", r"C:\Users\starriet\Desktop\pa_keypointj_upper_merged\pa_kp_anno_upper_merged_until3-102over111.json")
+# merge_anno_files(r"C:\Users\starriet\Desktop\pa_keypointj_upper_merged", r"C:\Users\starriet\Desktop\pa_keypointj_upper_merged\pa_kp_anno_upper_merged_until3-102over111.json")
+merge_anno_files(r"C:\Users\starriet\Desktop\pa_keypointj_lower_merged", r"C:\Users\starriet\Desktop\pa_keypointj_lower_merged\pa_kp_anno_lower_merged_until2-61over103.json")

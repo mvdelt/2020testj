@@ -27,7 +27,8 @@ def count_imgs(anno_file_path):
 # imgN = count_imgs(r"C:\Users\starriet\Desktop\pa_keypointj_upper_merged\train\pa_kp_anno_upper_merged.json")
 # imgN = count_imgs(r"C:\Users\starriet\Desktop\pa_keypointj_upper_merged\pa_kp_anno_upper_merged_until3-87over111.json")
 # imgN = count_imgs(r"C:\Users\starriet\Desktop\pa_keypointj_upper_merged\train\pa_kp_anno_upper_merged_until3-102over111.json")
-imgN = count_imgs(r"C:\Users\starriet\Desktop\pa_keypoint_validation.json")
+# imgN = count_imgs(r"C:\Users\starriet\Desktop\pa_keypoint_validation.json")
+imgN = count_imgs(r"C:\Users\starriet\Desktop\pa_keypointj_lower_merged\pa_kp_anno_lower_merged_until2-61over103.json")
 # print(r"C:\Users\starriet\Downloads\pa_bbox_upper.json")
 print(imgN,'- the number of images annotated in this json file.')
 
