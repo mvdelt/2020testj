@@ -675,6 +675,7 @@ def visualizeCodeFct_j(val_imgs_pathj): # i. <-일단 딱 요 한줄만 넣어�
 
     ## i. 드뎌 내가 수정해준 Visualizer_kplogitsj 클래스 사용!!
     # %cd /content
+    import os
     val_img_filename_list = os.listdir(val_imgs_pathj)
     val_img_filename_list = [fname for fname in val_img_filename_list if '.json' not in fname] ## i. 폴더에 어노테이션json파일 있어서, 그놈은 제외하려고 넣어준 코드.
     print('j) for {} test images...'.format(len(val_img_filename_list)))
