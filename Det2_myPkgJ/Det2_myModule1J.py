@@ -1,14 +1,145 @@
-# i. 2020.09.03.목욜저녁.첫작성.) 
-# 설명: 내 디텍트론2 코랩플젝(치과의료영상 딥러닝. 현재 임플 x-ray bone level 탐지 하는중이지)
-#       에서 줄줄이 죄다 코딩해논것들 깔끔히 리팩토링하기위해 이 모듈 만듦.
-#       일단 지금 PA_kp_paper.ipynb 코랩플젝을 리팩토링중이어서(엔드유저용으로, cfg랑 체크포인트는 다 다운받아서 인퍼런스만 하게끔), 
-#       PA_kp_paper.ipynb 의 코드들(중 인퍼런스에만 관계된것들만) 여기에 복사해옴.
+#@ i. 2020.09.03.목욜저녁.첫작성.) 
+#@ 표기: 코멘트는 #@ 로 표기했음. 기존 코드를 가져와서 추가적으로 수정하거나 코멘트덧붙였기때문에, 기존에 사용했던 #,## 등의 코멘트표기랑 구분하기 위함임.
+#@ 설명: 내 디텍트론2 코랩플젝(치과의료영상 딥러닝. 현재 임플 x-ray bone level 탐지 하는중이지)
+#@       에서 줄줄이 죄다 코딩해논것들 깔끔히 리팩토링하기위해 이 모듈 만듦.
+#@       일단 지금 PA_kp_paper.ipynb 코랩플젝을 리팩토링중이어서(엔드유저용으로, cfg랑 체크포인트는 다 다운받아서 인퍼런스만 하게끔), 
+#@       PA_kp_paper.ipynb 의 코드들(중 인퍼런스에만 관계된것들만) 여기에 복사해옴.
 
 
 # 여기서(맨위에서) 임포트할거 싹다해주면 되겠지? 함해보자. -> 되네.
 import os, cv2, torch
 import numpy as np
 from google.colab.patches import cv2_imshow # i. 이게 되나...??? 함해보자;; ->이게 되네;;
+
+
+
+
+
+#################################### i. 데이타셋 레지스터. ####################################################################################################################################################################
+
+
+###################### i. 메타데이타를 반환해주는 함수.##############################################################
+# i. keypoint detection의 경우, metadata로 "keypoint_names"랑 "keypoint_flip_map"을 넣어줘야되나봄.
+# 그래서, coco데이터셋기준으로 만들어져잇는 디텍트론2의 코드(_get_builtin_metadata함수(요건 키포인트 말고도 일반적인경우에 다 메타데이타 반환하게 만들어져있는듯)) 가져와서 내가 바꿔줄거임.
+def _get_builtin_metadata(dataset_name):
+
+    # if dataset_name == my_dataset_namej:
+    #     return {
+
+    #         # i. Q: COCO데이터셋 형식에 클래스이름이랑 키포인트 이름들이랑 스켈레톤 있는데 왜 그걸 안갖다쓰는것같지?            
+            
+    #         # i. Q: 요게 나오게되나? bbox의 클래스 이름으로? 어노테이션툴에서 지정해줬던 이름 쓰려면?
+    #         # -> 아. 지정해줫던 이름 쓰네. 따라서 요 코드한줄은 필요없음.
+    #         ## i. ->(나중첨언)일반적으로는 요 코드(thing_classes 값 설정해주는거) 필요함. Visualizer클래스의 draw_dataset_dict 메서드에서 self.metadata.get("thing_classes", None) 이런식으로 사용함.
+    #         ##    근데, 지금의경우엔 load_coco_json 함수에서 Metadata객체에 thing_classes 값을 넣어줌(어노테이션json파일에적혀잇는 카테고리명들 대로.).
+    #         ##    그래서 요 코드를 넣어버리면, 만약 어노테이션json파일에 적혀잇는 카테고리명과 지금 요 카테고리명이 다를경우, Metadata객체에 작성돼있는 __setattr__ 에서 기존값(요 코드에서 넣어준 카테고리명)과 새 값(load_coco_json함수가 넣어주는 카테고리명)이 다르다고 에러 발생시키도록 되어있음.
+    #         # "thing_classes": ["impkya"],
+
+    #         # i. Q: 요게 나오게되나? 각 keypoint의 이름으로? 어노테이션툴에서 지정해줬던 이름 쓰려면?
+    #         "keypoint_names": ("br","bl","ar","al","tr","tl"),
+    #         # "keypoint_names": ("br","bl"),
+    #         # "keypoint_names": ("bonelevel_upper",), # i. 요 튜플의 원소가 1개여도 comma 붙여줘야함(괄호안에 comma가 들어가야된다고)!!!!!! 안붙여주면 스트링의 각 캐릭터가 원소인걸로 됨!!! 'b','o','n','e',...이런식으로!!!!!! 
+
+    #         "keypoint_flip_map": (("br","bl"),("ar","al"),("tr","tl")),
+    #         # "keypoint_flip_map": (("br","bl")),
+    #         # "keypoint_flip_map": (), # i. 좌우 뒤집어줄거 없으면, 이와같이 텅빈튜플로 해주면 됨.
+
+
+    #         # i. keypoint_connection_rules는 왜정해주고잇지? 스켈레톤 정보 잇자나 coco데이터형식에. 스켈레톤에다가 추가되는건가?? 일단 요거 없이 해보자.
+    #         # ->없이하니까 포인트들만 찍히고, 선은 안그려지네. 그리고 포인트들이 다 똑같이 빨간색임.
+    #         # 그래서 걍 선 및 선색깔 지정해줘봄.
+    #         "keypoint_connection_rules": [
+    #             ("br","ar",(255, 255, 0)), # 노랑
+    #             ("br","tr",(255, 153, 0)), # 주황
+    #             ("bl","al",(255, 102, 255)), # 분홍
+    #             ("bl","tl",(153, 51, 153)), # 자주
+    #         ]
+
+    #         # i. br,bl두개만 찍을때도 걍 두점 사이 선으로 이어보려고. 걍 점만찍으니까 얘가 잘못찍엇을때 어케잘못찍은건지 구분이 잘 안돼서.
+    #         # "keypoint_connection_rules": [
+    #         #     ("br","bl",(255, 255, 0)), # 노랑
+    #         # ]
+
+    #     }
+
+    ## i. 2020.06.10.) 이렇게 해주고 값들 좀 바꿔줘봄. 색깔 달라지는거 눈으로 확인해보려고. ->작동함!
+    # if dataset_name == my_val_dataset_namej:
+    return {
+            "keypoint_names": ("br","bl","ar","al","tr","tl"),
+            # i. keypoint_flip_map 은 음... 일단은 필요없을테니 빼줘보자. 프레딕션시에도 데이타오그멘테이션(수평플립 등)해서 평균내서 프레딕션값을 내뱉게 하는 옵션도 아마 있을거임.
+            "keypoint_connection_rules": [
+                ("br","ar",(128, 255, 0)), # 요걸 파랑으로 바꿔줘봄. ->잘 됨!! 다시 다른색으로 변경함.
+                ("br","tr",(255, 153, 0)), # 주황
+                ("bl","al",(255, 102, 255)), # 분홍
+                ("bl","tl",(153, 51, 153)), # 자주
+            ]
+    }
+
+    # if dataset_name == "coco":
+    #     return _get_coco_instances_meta()
+    # if dataset_name == "coco_panoptic_separated":
+    #     return _get_coco_panoptic_separated_meta()
+    # elif dataset_name == "coco_person":
+    #     return {
+    #         "thing_classes": ["person"],
+    #         "keypoint_names": COCO_PERSON_KEYPOINT_NAMES,
+    #         "keypoint_flip_map": COCO_PERSON_KEYPOINT_FLIP_MAP,
+    #         "keypoint_connection_rules": KEYPOINT_CONNECTION_RULES,
+    #     }
+    # elif dataset_name == "cityscapes":
+    #     # fmt: off
+    #     CITYSCAPES_THING_CLASSES = [
+    #         "person", "rider", "car", "truck",
+    #         "bus", "train", "motorcycle", "bicycle",
+    #     ]
+    #     CITYSCAPES_STUFF_CLASSES = [
+    #         "road", "sidewalk", "building", "wall", "fence", "pole", "traffic light",
+    #         "traffic sign", "vegetation", "terrain", "sky", "person", "rider", "car",
+    #         "truck", "bus", "train", "motorcycle", "bicycle", "license plate",
+    #     ]
+    #     # fmt: on
+    #     return {
+    #         "thing_classes": CITYSCAPES_THING_CLASSES,
+    #         "stuff_classes": CITYSCAPES_STUFF_CLASSES,
+    #     }
+    # raise KeyError("No built-in metadata for dataset {}".format(dataset_name))
+######################## 메타데이타 반환해주는 함수 정의부 끝. ########################################################
+
+
+#@ i. 2020.09.04.금욜오후.작성.)
+#@ i. register_coco_instances 는 별거아니고 걍 DatasetCatalog.register 랑 MetadataCatalog.get(name).set(~~, **metadata) 를 해주는놈인데,
+#@    DatasetCatalog.register 의 두번째인자로 람다 안에 load_coco_json(~~) 함수를 넣어주는데, 요게 핵심임. 요놈이 COCO형식의 어노테이션json파일을 디텍트론2 의 형식으로 바꿔주는놈임.
+#@    근데, 지금 이 모듈(지금 이 파이썬파일) 만드는건 인퍼런스만 해주려는건데 DatasetCatalog.register 는 할필요없을것같아서, 
+#@    걍 MetadataCatalog.get(name).set(~~, **metadata) 만 사용해서 요기다가 metadata(바로위의 _get_builtin_metadata 함수가 리턴하는 딕셔너리. Metadata객체랑은 다른거지.) 만 넣어줄 생각임.
+
+
+# # COCO json 형식이면 디텍트론2에서 지원해준다함!! 그렇게 해보자!!
+# # 디텍트론2 도큐먼트에서 아래와같이 하면 된다함.
+# from detectron2.data.datasets import register_coco_instances  
+# # i, 두번째인풋인자가 메타데이타인데, 빈 딕셔너리 넣어도 된다는거 보니까 메타데이타는 걍 없어도 되나보네?
+# # 난 저밑에서 메타데이타.set에다가 kwargs로 thing_classes 넣어주길래 클래스종류(사람,개,고양이 등) 꼭 넣어줘야하는줄 알았는데.
+# # 하긴 메타데이터 말고 걍 데이터셋에 그런 정보 다 있긴하겠지 COCO dataset 형식뿐아니라 어지간한 형식들은.
+# # COCO dataset형식의경우 어노테이션 json파일 안에 보면 "categories"에 각 클래스들의 이름(개,고양이,사람 등)이랑 각 클래스의 id값 있음.
+# # register_coco_instances(my_dataset_namej, _get_builtin_metadata(my_dataset_namej), COCOformated_anno_json_pathj, train_imgs_pathj)
+
+# # i. 테스트용 데이터셋 레지스터.
+# # 두번째인풋인자에는 걍 텅빈값 {} 만 넣어줘도 될것같은데... 일단 일케 해줘봄.
+# # register_coco_instances(my_test_dataset_namej, _get_builtin_metadata(my_test_dataset_namej), COCOformated_test_anno_json_pathj, test_imgs_pathj) ########### 일단보류.넘늦엇다 자야함. 낼하자.
+# register_coco_instances(my_val_dataset_namej, _get_builtin_metadata(my_val_dataset_namej), COCOformated_val_anno_json_pathj, val_imgs_pathj) ########### 2020.06.10.드뎌해줘봄. test대신 val이라는 표현 사용함.
+
+
+
+########################################################################################################################################################################################################################
+
+
+
+
+
+
+
+
+
+
 
 
 
