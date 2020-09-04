@@ -8,6 +8,8 @@
 # 여기서(맨위에서) 임포트할거 싹다해주면 되겠지? 함해보자.
 import os, cv2
 import numpy as np
+from google.colab.patches import cv2_imshow # i. 이게 되나...??? 함해보자;;
+
 
 
 
@@ -710,7 +712,9 @@ def visualizeCodeFct_j(val_imgs_pathj, predictor, Visualizer_kplogitsj, Metadata
         #@ i. 원래 이 코드들 구글코랩에서 작성한거라, 코랩에서 제공하는 cv2_imshow 를 사용했었음(from google.colab.patches import cv2_imshow).
         #@    근데, 지금이걸(visualizeCodeFct_j 함수) 코랩에서 임포트해서 쓸라니까 코랩상에서 임포트해준것들은 작동이 안되어서(cv2_imshow 뿐만아니라 os, np, cv2 등 죄다 작동안됨. 지금 이 모듈에서 임포트해줘야함.),
         #@    그래서 cv2_imshow 대신 cv2.imshow 를 사용해줘봄.
-        cv2.imshow(pred_drawed_testimg_arr_resized[:, :, ::-1]) # i. 디텍션한 bbox, keypoints 그려준 이미지어레이 보여줌.@@@@@@@@@@@@@@@@@@(출력1)
+        #@  -> 안되네. DisabledFunctionError: cv2.imshow() is disabled in Colab, because it causes Jupyter sessions to crash; As a substitution, consider using 'from google.colab.patches import cv2_imshow' 라고 뜸.
+        #@     걍 이모듈의 저위에다가 from google.colab.patches import cv2_imshow 해줘보자.. 될라나..
+        cv2_imshow(pred_drawed_testimg_arr_resized[:, :, ::-1]) # i. 디텍션한 bbox, keypoints 그려준 이미지어레이 보여줌.@@@@@@@@@@@@@@@@@@(출력1)
         # cv2.imwrite("./drive/My Drive/PA_kp_paper_resultImages/{}_predDrawed.png".format(test_img_filename), pred_drawed_testimg_arr[:, :, ::-1]) # i. 이미지 저장.
         # print("j) {}_predDrawed.png saved!".format(test_img_filename))
 
@@ -718,7 +722,7 @@ def visualizeCodeFct_j(val_imgs_pathj, predictor, Visualizer_kplogitsj, Metadata
         visualizer.draw_kplogitsj(pred_pa_kp_upper["instances"].to("cpu"))
         pred_drawed_testimg_heatmapadded_arr = visImage.get_image()
         pred_drawed_testimg_heatmapadded_arr_resized = cv2.resize(pred_drawed_testimg_heatmapadded_arr, tuple(int(round(0.5*i)) for i in pred_drawed_testimg_heatmapadded_arr.shape[:2][::-1]), interpolation=cv2.INTER_AREA) # i. 이미지 넘 커서 리사이즈. Visualizer객체 이니셜라이즈할때 scale 정해주면 되는데, 지금 scale값 1인상태로 히트맵추가등 다 해줘버려서, 걍 이렇게 리사이즈해줌 일단.
-        cv2.imshow(pred_drawed_testimg_heatmapadded_arr_resized[:, :, ::-1]) # i. 위의결과에 추가로 히트맵까지 더해준 이미지어레이 보여줌.@@@@@@@@@@@@@@@@@@(출력2)
+        cv2_imshow(pred_drawed_testimg_heatmapadded_arr_resized[:, :, ::-1]) # i. 위의결과에 추가로 히트맵까지 더해준 이미지어레이 보여줌.@@@@@@@@@@@@@@@@@@(출력2)
         # cv2.imwrite("./drive/My Drive/PA_kp_paper_resultImages/{}_predDrawed-Heatmapadded.png".format(test_img_filename), pred_drawed_testimg_heatmapadded_arr[:, :, ::-1]) # i. 이미지 저장.
         # print("j) {}_predDrawed-Heatmapadded.png saved!".format(test_img_filename))
 
@@ -727,12 +731,12 @@ def visualizeCodeFct_j(val_imgs_pathj, predictor, Visualizer_kplogitsj, Metadata
         for i in visImage.boxCoordsTuple_listj: # i. 위에서 호출한 draw_kplogitsj 메서드에서 visImage 객체에 boxCoordsTuple_listj 를 만들어놨음.
             croppedArrj = pred_drawed_testimg_heatmapadded_arr[i[1]:i[3], i[0]:i[2]]
             visImage.heatmapaddedCroppedArr_listj.append(croppedArrj)
-            # cv2.imshow(croppedArrj[:, :, ::-1]) # i. box 크롭된거 보여줌.(히트맵까지 더해준 이미지어레이를 box대로 크롭한거) -> 일단 코멘트아웃. matplotlib 이용해서 플롯으로 한꺼번에 정리해서 보여주려고.
+            # cv2_imshow(croppedArrj[:, :, ::-1]) # i. box 크롭된거 보여줌.(히트맵까지 더해준 이미지어레이를 box대로 크롭한거) -> 일단 코멘트아웃. matplotlib 이용해서 플롯으로 한꺼번에 정리해서 보여주려고.
         ### i. 히트맵들 플롯팅해서 정리한거 보여줌.
         visualizer.show_kplogitsj(pred_pa_kp_upper["instances"].to("cpu").pred_keypoint_logits)
         num_detectedObjs = len(visImage.kpPlotRGBA_arr_listj)
         for idx, i in enumerate(visImage.kpPlotRGBA_arr_listj): # i. 위에서 호출한 show_kplogitsj 메서드에서 visImage 객체에 kpPlotRGBA_arr_listj 를 만들어놨음.
-            cv2.imshow(i[:,:,[2,1,0,3]]) # i. 히트맵들 플롯팅해서 정리한거 보여줌.@@@@@@@@@@@@@@@@@@(출력3)
+            cv2_imshow(i[:,:,[2,1,0,3]]) # i. 히트맵들 플롯팅해서 정리한거 보여줌.@@@@@@@@@@@@@@@@@@(출력3)
             # cv2.imwrite("./drive/My Drive/PA_kp_paper_resultImages/{}_predHeatmapPlot{}over{}.png".format(test_img_filename, idx+1, num_detectedObjs), i[:,:,[2,1,0,3]]) # i. 이미지 저장.
             # print("j) {}_predHeatmapPlot{}over{}.png saved!".format(test_img_filename, idx+1, num_detectedObjs))
             # i. 위에서 [2,1,0,3]이 뭐냐면, RGBA 를 BGRA 로 바꿔준거임. - 위의 for문의 각 i 가 RGBA로 된 이미지(넘파이어레이)인데, opencv 의 imshow 는 BGR 또는 BGRA 를 받기때문에.
