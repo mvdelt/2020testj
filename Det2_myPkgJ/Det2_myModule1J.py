@@ -5,6 +5,12 @@
 #       PA_kp_paper.ipynb 의 코드들(중 인퍼런스에만 관계된것들만) 여기에 복사해옴.
 
 
+# 여기서(맨위에서) 임포트할거 싹다해주면 되겠지? 함해보자.
+import os, cv2
+import numpy as np
+
+
+
 ################################ i. 키포인트 로짓(히트맵) 넣어주는 코드. ###############################################################################################################
 from detectron2.modeling.roi_heads.keypoint_head import KRCNNConvDeconvUpsampleHead, ROI_KEYPOINT_HEAD_REGISTRY, keypoint_rcnn_loss, keypoint_rcnn_inference
 ## i. keypoint head 클래스(의 (부모클래스의)forward함수)를 새로작성해줌. 여기서 keypoint_rcnn_inference 함수가 등장하거든. - Det2 소스코드가 업뎃돼서 이렇게 바뀐거임. 
@@ -677,7 +683,6 @@ def visualizeCodeFct_j(val_imgs_pathj, predictor, Visualizer_kplogitsj, Metadata
 
     ## i. 드뎌 내가 수정해준 Visualizer_kplogitsj 클래스 사용!!
     # %cd /content
-    import os, cv2
     val_img_filename_list = os.listdir(val_imgs_pathj)
     val_img_filename_list = [fname for fname in val_img_filename_list if '.json' not in fname] ## i. 폴더에 어노테이션json파일 있어서, 그놈은 제외하려고 넣어준 코드.
     print('j) for {} test images...'.format(len(val_img_filename_list)))
