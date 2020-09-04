@@ -5,10 +5,10 @@
 #       PA_kp_paper.ipynb 의 코드들(중 인퍼런스에만 관계된것들만) 여기에 복사해옴.
 
 
-# 여기서(맨위에서) 임포트할거 싹다해주면 되겠지? 함해보자.
-import os, cv2
+# 여기서(맨위에서) 임포트할거 싹다해주면 되겠지? 함해보자. -> 되네.
+import os, cv2, torch
 import numpy as np
-from google.colab.patches import cv2_imshow # i. 이게 되나...??? 함해보자;;
+from google.colab.patches import cv2_imshow # i. 이게 되나...??? 함해보자;; ->이게 되네;;
 
 
 
@@ -714,6 +714,7 @@ def visualizeCodeFct_j(val_imgs_pathj, predictor, Visualizer_kplogitsj, Metadata
         #@    그래서 cv2_imshow 대신 cv2.imshow 를 사용해줘봄.
         #@  -> 안되네. DisabledFunctionError: cv2.imshow() is disabled in Colab, because it causes Jupyter sessions to crash; As a substitution, consider using 'from google.colab.patches import cv2_imshow' 라고 뜸.
         #@     걍 이모듈의 저위에다가 from google.colab.patches import cv2_imshow 해줘보자.. 될라나..
+        #@     -> 오?! 되네??!!! from google.colab.patches import cv2_imshow 를 이 모듈에다가 적어줬는데도 되네!! 희한하네.. 그렇게치면 코랩에서 임포트해준거, 이 모듈 내에서 임포트 안해줘도 사용할수 있어야하는거아닌가? 준범에게 물어보자.
         cv2_imshow(pred_drawed_testimg_arr_resized[:, :, ::-1]) # i. 디텍션한 bbox, keypoints 그려준 이미지어레이 보여줌.@@@@@@@@@@@@@@@@@@(출력1)
         # cv2.imwrite("./drive/My Drive/PA_kp_paper_resultImages/{}_predDrawed.png".format(test_img_filename), pred_drawed_testimg_arr[:, :, ::-1]) # i. 이미지 저장.
         # print("j) {}_predDrawed.png saved!".format(test_img_filename))
