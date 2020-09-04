@@ -671,7 +671,7 @@ class Visualizer_kplogitsj(Visualizer):
 
 ######################################### i. 시각화결과 보여주는 코드(Visualizer_kplogitsj 클래스 이용해서)를 함수화했음. 외부에서 요놈을 임포트하기좋게. ###################################################################################
 
-def visualizeCodeFct_j(val_imgs_pathj, predictor, Visualizer_kplogitsj): 
+def visualizeCodeFct_j(val_imgs_pathj, predictor, Visualizer_kplogitsj, MetadataCatalog): 
     # i. ->일단 딱 val_imgs_pathj만 인풋인자로 해서 함수화해봄. predictor, Visualizer_kplogitsj 등도 인풋인자로 받아야하나? 일단 요렇게만 해서 해보자.
     # i. ->역시 안되네 ㅋㅋ. predictor, Visualizer_kplogitsj 도 인풋인자로 해주자.
 
