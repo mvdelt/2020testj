@@ -47,8 +47,8 @@ class KRCNNConvDeconvUpsampleHead_heatmapj(KRCNNConvDeconvUpsampleHead):
         pred_kp_logits_splited = pred_kp_logits.split(num_objects_per_image_list, dim=0)
 
         for pred_kp_logits_per_image, one_instances in zip(pred_kp_logits_splited, pred_instances):
-        # i. pred_kp_logits_per_image is (num objects in 1 input image) x (num keypoints) x (side length of the keypoint heatmap) x (side length of the keypoint heatmap)
-        one_instances.pred_keypoint_logits = pred_kp_logits_per_image
+            # i. pred_kp_logits_per_image is (num objects in 1 input image) x (num keypoints) x (side length of the keypoint heatmap) x (side length of the keypoint heatmap)
+            one_instances.pred_keypoint_logits = pred_kp_logits_per_image
 
 #####################################################################################################################################################################################
 
