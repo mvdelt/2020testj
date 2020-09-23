@@ -1,5 +1,7 @@
-# -*- coding: utf-8 -*-
 """
+# i. PyTorch 이용한 ResNet 구현 코드. - 2020.09.초쯤부터 째끔씩 보기시작한 코드. Aladdin Persson 이라는 유투버가 작성한 코드임.
+깃헙: https://github.com/AladdinPerzon/Machine-Learning-Collection/blob/master/ML/Pytorch/CNN_architectures/pytorch_resnet.py
+
 From scratch implementation of the famous ResNet models.
 The intuition for ResNet is simple and clear, but to code
 it didn't feel super clear at first, even when reading Pytorch own
@@ -121,18 +123,22 @@ class ResNet(nn.Module):
         # i. 요 if문 필요없는것같은데?? 지금 resnet 50,101,152에대해서만 구현하고있는듯한데,
         #    resnet50,101,152에서는 어차피 요 if문 조건 필요없고,
         #    resnet18,34를 구현한다해도 걍 첫번째 _make_layer호출할때만 identity_downsample=None으로 해주면 될듯.
-        if stride != 1 or self.in_channels != intermediate_channels * 4:  
-            identity_downsample = nn.Sequential(
-                # i. resnet논문 p.4 우상단 내용 중 옵션B, 즉 eq.2 의 구현임. x의 디멘션과 F의아웃풋의 디멘션을 맞춰주는거.(여기서 즉 resnet논문에서 '디멘션' 이라 함은, 그냥 피쳐맵(conv연산의 결과)의 채널수 말하는거임. 스페이셜디멘션이라하면 피쳐맵의 가로세로 길이를 말하는거고.)
-                # 1x1 conv 이용해서 디멘션(채널수) 맞춰주고, spatial dimension (가로세로길이) 달라질경우 stride 2 로 해서 스페이셜디멘션도 맞춰주고.
-                nn.Conv2d(
-                    self.in_channels, # i. 기존 x의 채널수.
-                    intermediate_channels * 4, # i. F의 아웃풋의 채널수. x는 이제 이값으로 채널수가 바뀌는거지.  
-                    kernel_size=1, # i. 1x1 conv.
-                    stride=stride, # i. stride=2 면 스페이셜디멘션 줄여줘야하니까.
-                ),
-                nn.BatchNorm2d(intermediate_channels * 4),
-            )
+        # if stride != 1 or self.in_channels != intermediate_channels * 4:
+        # print('j) if yes~~~')
+        identity_downsample = nn.Sequential(
+            # i. resnet논문 p.4 우상단 내용 중 옵션B, 즉 eq.2 의 구현임. x의 디멘션과 F의아웃풋의 디멘션을 맞춰주는거.(여기서 즉 resnet논문에서 '디멘션' 이라 함은, 그냥 피쳐맵(conv연산의 결과)의 채널수 말하는거임. 스페이셜디멘션이라하면 피쳐맵의 가로세로 길이를 말하는거고.)
+            # 1x1 conv 이용해서 디멘션(채널수) 맞춰주고, spatial dimension (가로세로길이) 달라질경우 stride 2 로 해서 스페이셜디멘션도 맞춰주고.
+            nn.Conv2d(
+                self.in_channels, # i. 기존 x의 채널수.
+                intermediate_channels * 4, # i. F의 아웃풋의 채널수. x는 이제 이값으로 채널수가 바뀌는거지.  
+                kernel_size=1, # i. 1x1 conv.
+                stride=stride, # i. stride=2 면 스페이셜디멘션 줄여줘야하니까.
+            ),
+            nn.BatchNorm2d(intermediate_channels * 4),
+        )
+        # else:
+        #     # i. 역시 내생각이 맞네. 요거 출력 안됨.(위의 if문 필요없음.)
+        #     print('j) else!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 
         layers.append(
             block(self.in_channels, intermediate_channels, identity_downsample, stride)
@@ -162,10 +168,28 @@ def ResNet152(img_channel=3, num_classes=1000):
     return ResNet(block, [3, 8, 36, 3], img_channel, num_classes)
 
 
-def test():
-    net = ResNet101(img_channel=3, num_classes=1000)
-    y = net(torch.randn(4, 3, 224, 224)).to("cuda")
-    print(y.size())
+def test_ResNet152():
+    resnet152 = ResNet152(img_channel=3, num_classes=1000)
+    # i. 인풋형태: (N, C, H, W). N이 뱃치사이즈겠지. 
+    torch.manual_seed(123)
+    x=torch.randn(2, 3, 224, 224)
+    # print(f'input x:{x}')
+    y_pred = resnet152(x).to("cuda")
+    print('y_pred.size():',y_pred.size())
+    print(f'y_pred:{y_pred}')
+
+def test_ResNet50():
+    resnet50 = ResNet50(img_channel=3, num_classes=1000)
+    # i. 인풋형태: (N, C, H, W). N이 뱃치사이즈겠지. 
+    torch.manual_seed(123)
+    x=torch.randn(2, 3, 224, 224)
+    # print(f'input x:{x}')
+    y_pred = resnet50(x).to("cuda")
+    print('y_pred.size():',y_pred.size())
+    print(f'y_pred:{y_pred}')
 
 
-test()
+test_ResNet152()
+test_ResNet50()
+
+
