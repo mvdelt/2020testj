@@ -600,6 +600,7 @@ class Visualizer_kplogitsj(Visualizer):
 
             alpha = 1.0,
             fontfamily = 'cursive',
+            fontname = 'cursive',
             fontweight = 'semibold'
         )
         self.draw_text( ## 분류결과 출력(예: Early 이런식).
@@ -615,6 +616,7 @@ class Visualizer_kplogitsj(Visualizer):
 
             alpha = 1.0,
             fontfamily = 'Helvetica',
+            fontname = 'Cursive',
             fontweight = 'bold'                
         )
 
