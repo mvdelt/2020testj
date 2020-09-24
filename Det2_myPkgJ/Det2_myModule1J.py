@@ -599,8 +599,8 @@ class Visualizer_kplogitsj(Visualizer):
             zorderj=50,
 
             alpha = 1.0,
-            fontfamily = 'cursive',
-            fontname = 'cursive',
+            # fontfamily = 'cursive', # i. 코랩에서 폰트가 적용 안되네.. 일단 걍 폰트신경쓰지말고 하자.
+            # fontname = 'cursive', # i. 이렇게해봐도안되고..
             fontweight = 'semibold'
         )
         self.draw_text( ## 분류결과 출력(예: Early 이런식).
@@ -615,8 +615,7 @@ class Visualizer_kplogitsj(Visualizer):
             zorderj=50,
 
             alpha = 1.0,
-            fontfamily = 'Helvetica',
-            fontname = 'Cursive',
+            # fontfamily = 'Helvetica',
             fontweight = 'bold'                
         )
 
@@ -812,7 +811,13 @@ class Visualizer_kplogitsj(Visualizer):
 
 ######################################### i. 시각화결과 보여주는 코드(Visualizer_kplogitsj 클래스 이용해서)를 함수화했음. 외부에서 요놈을 임포트하기좋게. ###################################################################################
 
-def visualizeCodeFct_j(val_imgs_pathj, predictor, Visualizer_kplogitsj, MetadataCatalog, my_val_dataset_namej): 
+def visualizeCodeFct_j(val_imgs_pathj, slicej, uplowClassifier, up_predictor, low_predictor, Visualizer_kplogitsj, metadata_j): 
+
+    #@@ i. 2020.09.24.) 상하악분류모델 적용에따라 좀더수정함:
+    #@@    1) 이건 상하악분류모델과는 관계없는 수정이지만, slice 객체를 인풋인자로 받아서 이미지 선택 용이하게함.
+    #@@    2) 인풋인자로 받는 모델은 기존에는 predictor 하나였는데, 상하악분류모델 & 상악predictor & 하악predictor 이렇게 3가지 모델을 인풋인자로 받도록함. 
+    
+
     #@ i. ->일단 딱 val_imgs_pathj만 인풋인자로 해서 함수화해봄. predictor, Visualizer_kplogitsj 등도 인풋인자로 받아야하나? 일단 요렇게만 해서 해보자.
     #@ i. ->역시 안되네 ㅋㅋ. predictor, Visualizer_kplogitsj 도 인풋인자로 해주자.
 
@@ -823,15 +828,37 @@ def visualizeCodeFct_j(val_imgs_pathj, predictor, Visualizer_kplogitsj, Metadata
     print('j) for {} test images...'.format(len(val_img_filename_list)))
     ### i. 자꾸 코랩 다운돼서 일단 5개만 해줘봄.
     ####  ->이유는몰겟는데 이제 36개val데이타셋 다돌려도 다운안됨. 근데 시간오래걸려서 걍 5개만해놨음.
-    for test_img_filename in val_img_filename_list[:20]: 
+    for test_img_filename in val_img_filename_list[slicej]: 
         testimg_arr = cv2.imread(os.path.join(val_imgs_pathj, test_img_filename))
+
+
+
+        ########################## i. 2020.09.24. 수정중. ###########################################################################################
+        #@@ i. 위의 testimg_arr 는 넘파이어레이로서 각 원소들은 0~255 의 값을 가지고, (H,W,C) 형태임.
+        #@@    그런데, uplowClassifier 는 각 원소값들이 0~1이고 (C,H,W) 형태인 파이토치 텐서 형식의 이미지를 인풋으로 받음.
+        #@@    따라서, 변환해줘야함.
+        testimg_tensor = torch.from_numpy(testimg_arr/255).permute(2,0,1) # i. 넘파이어레이를 255로 나눠주고, 토치텐서로 변환후, (H,W,C)에서 (C,H,W)형태로 변환.
+
+        #@@ i. 흠.. testimg_tensor 를 그냥넣어주면 안되고, 디멘션 하나 추가해서 넣어줘야하나? [testimg_tensor] 요런식으로?
+        #@@    왜냐면 원래 요 uplowClassifier(resnet152) 는 미니뱃치 단위로 인풋을 받으니까.. 지금 미니뱃치 사이즈가 1이셈이니.. 
+        # uplowCls = uplowClassifier(testimg_tensor) #@@ i. 즉 요렇게가 아니고
+        uplowCls = uplowClassifier(testimg_tensor.unsqueeze_(0)) #@@ i. 이런식으로 해줘야하려나?
+
+        #@@ i. 작성중...
+        predictor = up_predictor if upPA else low_predictor 
+
+        ##########################################################################################################################################
+
+
+
+
         # 요기서 predictions는 {"instances": (Instances클래스의인스턴스)} 의 형태를 가진 딕셔너리일거임. - 내가 vscode로 공부중인 디텍트론2플젝의 DefaultTrainer코드에 코멘트 상세히 적어놨음.
         # 실제로 출력해봐도 그렇고. 죠 아래에서도 predictions["instances"] 로 값을 꺼내오고있고.
         pred_pa_kp_upper = predictor(testimg_arr)
         # print('j) pred_pa_kp_upper:', pred_pa_kp_upper) # i. 2020.06.21.) 키포인트에대한 스코어값이 들어있었나 체크해보려고 출력해봣는데, 역시 없음. 옵젝디텍션 스코어만 있을 뿐임.
         visualizer = Visualizer_kplogitsj(
                     testimg_arr[:, :, ::-1],                   
-                    metadata=MetadataCatalog.get(my_val_dataset_namej),
+                    metadata=metadata_j,
                     scale=1.0,
                     # i. 일단요거없애고해보자.
                     # instance_mode=ColorMode.IMAGE_BW   # remove the colors of unsegmented pixels
