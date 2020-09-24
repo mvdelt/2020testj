@@ -841,13 +841,17 @@ def visualizeCodeFct_j(val_imgs_pathj, slicej, uplowClassifier, up_predictor, lo
 
         #@@ i. 흠.. testimg_tensor 를 그냥넣어주면 안되고, 디멘션 하나 추가해서 넣어줘야하나? [testimg_tensor] 요런식으로?
         #@@    왜냐면 원래 요 uplowClassifier(resnet152) 는 미니뱃치 단위로 인풋을 받으니까.. 지금 미니뱃치 사이즈가 1이셈이니.. 
-        # uplowCls = uplowClassifier(testimg_tensor) #@@ i. 즉 요렇게가 아니고
-        uplowCls = uplowClassifier(testimg_tensor.unsqueeze_(0)) #@@ i. 이런식으로 해줘야하려나?
+        # uplow_pred = uplowClassifier(testimg_tensor) #@@ i. 즉 요렇게가 아니고
+        uplow_pred = uplowClassifier(testimg_tensor.unsqueeze_(0)) #@@ i. 이런식으로 해줘야하려나? ->일단 적어도 이건 작동해야 말이됨.        
+        #@@ i. ->uplow_pred 는 tensor([[0.2, 0.8], [0.1, 0.9], ...]) 이런식일텐데.. 근데 지금같은경우 미니뱃치사이즈 1 이니, tensor([[0.2, 0.8]]) 이런식일듯? ->역시 맞네. 확인해봣음.
+        
+        #@@ i. 모델(resnet152)의 아웃풋(uplow_pred)은 바로위에코멘트적어놨듯이 (뱃치사이즈, 클래스갯수) 의 형태임. torch.max 사용해서 클래스분류결과 추출해줌. 
+        _, predIndices = torch.max(uplow_pred, 1) #@@ i. predIndeces 는 tensor([0,1,0,0]) 등의 형태. 지금 미니뱃치사이즈 1이니, tensor([0]) 이런식이겠지. 0은 하악PA, 1은 상악PA임.
 
-        #@@ i. 작성중...
-        predictor = up_predictor if upPA else low_predictor 
-
-        ##########################################################################################################################################
+        #@@ i. predIndices 가 원소1개인 텐서이므로, predIndices.item() 으로 해당 원소의 값을 얻음. 그값이 0이면 하악PA, 1이면 상악PA 니까, 그에맞는 상악용or하악용 키포인트디텍션모델 할당해줌.
+        predictor = up_predictor if predIndices.item()==1 else low_predictor 
+        #@@ i. 자 이제 다된것같은데..? 함돌려보자!
+        ##############################################################################################################################################
 
 
 
