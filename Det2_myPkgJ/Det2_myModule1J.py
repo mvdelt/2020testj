@@ -842,7 +842,7 @@ def visualizeCodeFct_j(val_imgs_pathj, slicej, uplowClassifier, up_predictor, lo
         #@@ i. 흠.. testimg_tensor 를 그냥넣어주면 안되고, 디멘션 하나 추가해서 넣어줘야하나? [testimg_tensor] 요런식으로?
         #@@    왜냐면 원래 요 uplowClassifier(resnet152) 는 미니뱃치 단위로 인풋을 받으니까.. 지금 미니뱃치 사이즈가 1이셈이니.. 
         # uplow_pred = uplowClassifier(testimg_tensor) #@@ i. 즉 요렇게가 아니고
-        print(f'j) testimg_tensor: {testimg_tensor}')
+        print(f'j) testimg_tensor.unsqueeze_(0): {testimg_tensor.unsqueeze_(0)}')
         uplow_pred = uplowClassifier(testimg_tensor.unsqueeze_(0)) #@@ i. 이런식으로 해줘야하려나? ->일단 적어도 이건 작동해야 말이됨.        
         #@@ i. ->uplow_pred 는 tensor([[0.2, 0.8], [0.1, 0.9], ...]) 이런식일텐데.. 근데 지금같은경우 미니뱃치사이즈 1 이니, tensor([[0.2, 0.8]]) 이런식일듯? ->역시 맞네. 확인해봣음.
         
