@@ -835,9 +835,9 @@ def visualizeCodeFct_j(val_imgs_pathj, slicej, uplowClassifier, up_predictor, lo
 
         ########################## i. 2020.09.24. 수정중. ###########################################################################################
         #@@ i. 위의 testimg_arr 는 넘파이어레이로서 각 원소들은 0~255 의 값을 가지고, (H,W,C) 형태임.
-        #@@    그런데, uplowClassifier 는 각 원소값들이 0~1이고 (C,H,W) 형태인 파이토치 텐서 형식의 이미지를 인풋으로 받음.
+        #@@    그런데, uplowClassifier 는 각 원소값들이 0~1이고 (C,H,W) 형태인 파이토치 텐서 형식의 이미지를 인풋으로 받음. 또한, float 이 아닌 double 을 받음.
         #@@    따라서, 변환해줘야함.
-        testimg_tensor = torch.from_numpy(testimg_arr/255).permute(2,0,1) # i. 넘파이어레이를 255로 나눠주고, 토치텐서로 변환후, (H,W,C)에서 (C,H,W)형태로 변환.
+        testimg_tensor = torch.from_numpy(testimg_arr/255).permute(2,0,1).to(torch.float64) # i. 넘파이어레이를 255로 나눠주고, 토치텐서로 변환후, (H,W,C)에서 (C,H,W)형태로 변환한뒤, double 타입으로 변환.
 
         #@@ i. 흠.. testimg_tensor 를 그냥넣어주면 안되고, 디멘션 하나 추가해서 넣어줘야하나? [testimg_tensor] 요런식으로?
         #@@    왜냐면 원래 요 uplowClassifier(resnet152) 는 미니뱃치 단위로 인풋을 받으니까.. 지금 미니뱃치 사이즈가 1이셈이니.. 
