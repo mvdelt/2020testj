@@ -78,6 +78,7 @@ class OKS_j:
             oks = self.compute_OKS_j(an1['keypoints'], an2['keypoints'], an1['area'])
             # print('j) oks for this 1 pair:{}, its type(should be float or sth like that):{}'.format(oks, type(oks))) # i. 타입은 <class 'numpy.float64'> 이네.
             oks_list.append(float(oks)) # i. 걍 혹시몰라서, 넘파이float64 에서 파이썬float으로 바꿔줌.
+        self.oks_list = oks_list
         print('j) len(oks_list):', len(oks_list))
         print('j) oks_list:', oks_list)
         self.mean_oks = sum(oks_list)/len(oks_list)  # i. 타입은 파이썬float.

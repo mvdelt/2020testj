@@ -19,7 +19,8 @@ def count_ans(anno_file_path):
         return len(anno)
 
 # num_ans = count_ans(r"C:\Users\starriet\Desktop\for_meanOKS\meanOKS2\cocoformatted_anlist_dt.json")
-num_ans = count_ans(r"C:\Users\starriet\Desktop\for_meanOKS\meanOKS2\pa_keypoint_validation.json")
+# num_ans = count_ans(r"C:\Users\starriet\Desktop\for_meanOKS\meanOKS2\pa_keypoint_validation.json")
+num_ans = count_ans(r"C:\Users\starriet\Desktop\PA_kp_val_lower_20200603PA_lower\PA_kp_val_lower_20200603PA_lower.json") ## i. 2020.11.01.수욜.실행.
 print(num_ans,'- the number of annotation(per 1 object)s in this json file.')
 
 
